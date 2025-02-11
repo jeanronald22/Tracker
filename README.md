@@ -32,8 +32,3 @@ Technologies Utilisées 🛠️
 -   TypeScript : Ajout de types statiques pour une meilleure maintenabilité.
 -   Vite : Outil de build rapide pour le développement moderne.
 
-Captures d'Écran du travail accuel🖼️
-
-![Pomodoro Timer en mode travail](./screenshots/pomodoro.png)
-Mode travail avec cercle de progression.
-```
