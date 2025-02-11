@@ -1,7 +1,7 @@
 import { useEffect, useReducer } from 'react';
-import { pomodoroReducer } from './reducer/reducer';
-import { initialState } from './reducer/initialState';
-import { Actions } from './reducer/action';
+import { pomodoroReducer } from './store/reducer';
+import { initialState } from './store/initialState';
+import { Actions } from './store/action';
 import { formatTime } from '@/helpers/formatTime';
 import focus from '@/assets/concentration.png';
 import relaxation from '@/assets/relaxation.png';
