@@ -1,50 +1,39 @@
-# React + TypeScript + Vite
+```markdown
+# FocusFlow 🚀
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+FocusFlow est une application de productivité tout-en-un qui combine un Pomodoro Timer\*, un Task Tracker, et bien plus encore pour vous aider à rester organisé et concentré.
 
-Currently, two official plugins are available:
+Fonctionnalités ✨
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+🍅 Pomodoro Timer
 
-## Expanding the ESLint configuration
+-   Timer intelligent : Alterne entre des sessions de travail (25 minutes) et des pauses (5 minutes).
+-   Progress Ring : Un cercle de progression visuel pour suivre le temps restant.
+-   Animations fluides : Transitions douces entre les états de travail et de pause.
+-   Personnalisation : Ajustez les durées de travail et de pause selon vos préférences.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+✅ Task Tracker
 
-- Configure the top-level `parserOptions` property like this:
+-   Gestion des tâches : Ajoutez, modifiez et supprimez des tâches facilement.
+-   Priorisation : Marquez les tâches importantes et suivez leur progression.
+-   Intégration Pomodoro : Associez des sessions Pomodoro à vos tâches pour une meilleure gestion du temps.
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+🚀 Fonctionnalités Futures
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+-   statistiques : Visualisez votre productivité avec des graphiques et des rapports.
+-   Objectifs quotidiens : Définissez des objectifs et suivez vos progrès.
+-   Synchronisation cloud : Sauvegardez vos tâches et paramètres dans le cloud.
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+Technologies Utilisées 🛠️
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+-   React : Bibliothèque JavaScript pour l'interface utilisateur.
+-   Tailwind CSS: Framework CSS pour un design moderne et responsive.
+-   Framer Motion : Bibliothèque d'animations pour des transitions fluides.
+-   TypeScript : Ajout de types statiques pour une meilleure maintenabilité.
+-   Vite : Outil de build rapide pour le développement moderne.
+
+Captures d'Écran du travail accuel🖼️
+
+![Pomodoro Timer en mode travail](./screenshots/pomodoro.png)
+Mode travail avec cercle de progression.
 ```
