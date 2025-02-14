@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import { pomodoroReducer } from './store/reducer';
 import { initialState } from './store/initialState';
 import { Actions } from './store/action';
@@ -9,43 +9,135 @@ import { Button } from '@/components/ui/button';
 import {
 	CircleFadingArrowUpIcon,
 	CircleStopIcon,
+	Edit2,
 	PlaySquareIcon,
 	Settings,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ProgressRing } from '@/components/ProsseRing';
+import Modal from '@/components/ui/Modale';
+import { Input } from '@/components/ui/input';
+import alerts from '@/assets/audio/alerts.wav';
+import clock from '@/assets/audio/clock.wav';
 
 export function Pomodoro() {
+	// Instances audio
+	const tickAudio = new Audio(clock);
+	const alertAudio = new Audio(alerts);
+
+	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [state, dispatch] = useReducer(pomodoroReducer, initialState);
-	// Calcul de la progression en pourcentage
+	const [data, setData] = useState({
+		work: state.workDuration / 60,
+		break: state.breakDuration / 60,
+	});
+
 	const progress =
-		((state.workDuration - state.timeLeft) / state.workDuration) * 100;
+		state.sessionType === 'work'
+			? ((state.workDuration - state.timeLeft) / state.workDuration) * 100
+			: ((state.breakDuration - state.timeLeft) / state.breakDuration) *
+			  100;
+
+	const openModal = () => setIsModalOpen(true);
+	const closeModal = () => setIsModalOpen(false);
+
+	const handleChange = (field: string, value: string) => {
+		const newVal = parseInt(value, 10);
+		if (!isNaN(newVal)) {
+			setData((prev) => ({
+				...prev,
+				[field]: newVal,
+			}));
+		}
+	};
+
+	const handlerEditeTime = () => {
+		dispatch({
+			type: Actions.EDIT_TIME,
+			payload: {
+				workDuration: data.work * 60,
+				breakDuration: data.break * 60,
+			},
+		});
+		closeModal();
+	};
+
+	const handlePause = () => {
+		dispatch({ type: Actions.PAUSE });
+		tickAudio.pause(); // Arrêter le son de tic-tac
+		tickAudio.currentTime = 0; // Réinitialiser le son
+	};
+
+	const handleReset = () => {
+		dispatch({ type: Actions.RESET });
+		tickAudio.pause(); // Arrêter le son de tic-tac
+		tickAudio.currentTime = 0; // Réinitialiser le son
+		alertAudio.pause(); // Arrêter l'alarme
+		alertAudio.currentTime = 0; // Réinitialiser l'alarme
+	};
+
+	useEffect(() => {
+		if (isModalOpen) {
+			setData({
+				work: state.workDuration / 60,
+				break: state.breakDuration / 60,
+			});
+		}
+	}, [isModalOpen, state.workDuration, state.breakDuration]);
 
 	useEffect(() => {
 		let interval: NodeJS.Timeout;
+		tickAudio.load();
+		alertAudio.load();
+
 		if (state.isRunning) {
 			interval = setInterval(() => {
 				if (state.timeLeft > 0) {
 					dispatch({ type: Actions.DECREMENT_TIME });
+					if (document.hasFocus()) {
+						tickAudio.play().catch((error) => {
+							console.error(
+								'Erreur lors de la lecture du son de tic-tac :',
+								error
+							);
+						});
+					}
 				} else {
 					dispatch({ type: Actions.SWITCH_SESSION });
 					dispatch({ type: Actions.PAUSE });
+					if (document.hasFocus()) {
+						alertAudio.play().catch((error) => {
+							console.error(
+								"Erreur lors de la lecture de l'alarme :",
+								error
+							);
+						});
+					}
 				}
 			}, 1000);
 		}
-		return () => clearInterval(interval);
+
+		return () => {
+			clearInterval(interval);
+			tickAudio.pause();
+			tickAudio.currentTime = 0;
+		};
 	}, [state.isRunning, state.timeLeft]);
 
 	return (
 		<div className="grid min-h-screen md:grid-cols-2 overflow-hidden">
 			{/* Section Image Fixe */}
-			<div className="hidden  md:flex justify-center items-center">
+			<div className="hidden md:flex justify-center items-center">
 				<AnimatePresence mode="wait">
 					<motion.img
-						key={state.isRunning ? 'focus' : 'relaxation'}
-						src={state.isRunning ? focus : relaxation}
-						alt={state.isRunning ? 'Concentration' : 'Détente'}
-						className="inset-0 h-10/12 w-10/12 object-cover"
+						key={state.sessionType} // Utiliser sessionType comme clé
+						src={state.sessionType === 'work' ? focus : relaxation}
+						alt={
+							state.sessionType === 'work'
+								? 'Concentration'
+								: 'Détente'
+						}
+						className="inset-0 w-auto object-cover"
 						initial={{ opacity: 0, y: 20 }}
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0, y: -20 }}
@@ -65,13 +157,13 @@ export function Pomodoro() {
 				>
 					<AnimatePresence mode="wait">
 						<motion.div
-							key={state.isRunning ? 'working' : 'resting'}
+							key={state.sessionType} // Utiliser sessionType comme clé
 							initial={{ opacity: 0, y: 10 }}
 							animate={{ opacity: 1, y: 0 }}
 							exit={{ opacity: 0, y: -10 }}
 							className="text-center mb-8"
 						>
-							{state.isRunning ? (
+							{state.sessionType === 'work' ? (
 								<div>
 									<h1 className="text-3xl font-bold text-foreground mb-2">
 										Plongez dans votre travail 🚀
@@ -112,7 +204,7 @@ export function Pomodoro() {
 						animate={{ opacity: 1 }}
 					>
 						<Button
-							onClick={() => dispatch({ type: Actions.PAUSE })}
+							onClick={handlePause}
 							variant="outline"
 							className="gap-2 transition-transform hover:scale-105"
 						>
@@ -126,14 +218,12 @@ export function Pomodoro() {
 						>
 							<PlaySquareIcon className="h-5 w-5" />
 							<span>
-								{state.timeLeft === 25 * 60
-									? 'Commencer'
-									: 'Continuer'}
+								{state.isRunning ? 'Continuer' : 'Commencer'}
 							</span>
 						</Button>
 
 						<Button
-							onClick={() => dispatch({ type: Actions.RESET })}
+							onClick={handleReset}
 							variant="outline"
 							className="gap-2 transition-transform hover:scale-105"
 						>
@@ -143,7 +233,56 @@ export function Pomodoro() {
 					</motion.div>
 
 					{/* Réglages */}
-					<div className="flex space-x-3 mt-5 cursor-pointer font-mono text-card-foreground">
+					<Modal
+						isOpen={isModalOpen}
+						onClose={closeModal}
+						title="Ajuster les réglages"
+					>
+						<motion.div
+							initial={{ opacity: 0, y: -20 }}
+							animate={{ opacity: 1, y: 0 }}
+							exit={{ opacity: 0, y: 20 }}
+							transition={{ duration: 0.3 }}
+						>
+							{/* formulaire de modification */}
+							<div>
+								<label className="text-lg">
+									Temps de travail
+								</label>
+								<Input
+									type="number"
+									placeholder="Temps de travail"
+									value={data.work}
+									className="my-2"
+									onChange={(e) =>
+										handleChange('work', e.target.value)
+									}
+								/>
+							</div>
+							<div>
+								<label className="text-lg">
+									Temps de pause
+								</label>
+								<Input
+									type="number"
+									placeholder="Temps de pause"
+									value={data.break}
+									className="my-2"
+									onChange={(e) =>
+										handleChange('break', e.target.value)
+									}
+								/>
+							</div>
+							<Button className="mt-5" onClick={handlerEditeTime}>
+								<Edit2 />
+								<span>Modifier</span>
+							</Button>
+						</motion.div>
+					</Modal>
+					<div
+						className="flex space-x-3 mt-5 cursor-pointer font-mono text-card-foreground"
+						onClick={openModal}
+					>
 						<Settings />
 						<p>Réglages</p>
 					</div>
