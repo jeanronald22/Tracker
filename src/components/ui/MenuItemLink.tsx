@@ -12,10 +12,10 @@ const MenuItemLink = ({ to, children }: MenuItemLinkProps) => {
 				to={to}
 				end
 				className={
-					({ isActive }) =>
+					({ isActive }: { isActive: boolean }) =>
 						isActive
 							? 'block p-2 bg-primary text-primary-foreground rounded-lg' // Style actif
-							: 'block p-2 text-foreground hover:bg-secondary hover:text-secondary-foreground rounded-lg transition-colors' // Style par défaut
+							: 'block p-2 text-foreground hover:bg-secondary/20 hover:text-secondary-foreground rounded-lg transition-colors' // Style par défaut
 				}
 			>
 				{children}
