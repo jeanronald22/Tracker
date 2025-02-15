@@ -5,17 +5,24 @@ import {
 	SidebarContent,
 	SidebarHeader,
 } from '@/components/ui/sidebar';
-import { BookCheck } from 'lucide-react';
+import { Focus } from 'lucide-react';
+import Menu from './ui/Menu';
+import { MenuItemLinkProps } from './ui/MenuItemLink';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+	const MenuItem: MenuItemLinkProps[] = [
+		{ to: '/', children: 'Pomodoro' },
+		{ to: '/task', children: 'Task' },
+	];
 	return (
 		<Sidebar collapsible="icon" {...props}>
-			<SidebarHeader>
-				<div className="flex items-center  gap-2">
-					<BookCheck className="size-6" />
-				</div>
+			<SidebarHeader className="flex-row justify-center items-center mt-2">
+				<Focus className="w-12 size-8" />
+				<span className="font-semibold font-mono">Focus Flow</span>
 			</SidebarHeader>
-			<SidebarContent></SidebarContent>
+			<SidebarContent>
+				<Menu items={MenuItem} />
+			</SidebarContent>
 			{/* <SidebarFooter>
 				<NavUser user={data.user} />
 			</SidebarFooter> */}
