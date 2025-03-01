@@ -13,3 +13,16 @@ export interface ProgressRingProps {
 	color?: string; // Couleur de la progression
 	children?: React.ReactNode; // Contenu à afficher au centre
 }
+export interface TodoType {
+	id:string,
+	title:string,
+	description:string,
+	status:'done' | 'todo' | 'inprogress',
+	priority:'low' | 'medium' | 'high',
+	createdAt:string,
+	updatedAt:string
+}
+export interface TodoAction {
+	type: string;
+	payload: Partial<TodoType>;
+}
